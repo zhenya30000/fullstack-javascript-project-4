@@ -3,6 +3,7 @@
 import { Command } from 'commander';
 import { cwd } from 'process';
 import pageLoader from '../src/index.js';
+import path from 'path';
 
 const program = new Command();
 
@@ -12,8 +13,9 @@ program
   .version('0.0.1')
   .arguments('<url>')
   .option('-o, --output [dir]', 'output dir',cwd())
-  .action((url, filePath) => {
-    pageLoader(url, filePath);
+  .action((url, options) => {
+    console.log(options.output);
+    pageLoader(url, options.output);
   });
 
 program.parse();

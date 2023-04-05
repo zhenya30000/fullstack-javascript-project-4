@@ -28,3 +28,10 @@ or
 make link
 ```
 ## Usage 
+
+
+## Exmaples of usage
+
+Single page download and using custom output 
+
+<a href="https://asciinema.org/a/Zxiv7VK3lOFPrkFRdvicUgdiq" target="_blank"><img src="https://asciinema.org/a/Zxiv7VK3lOFPrkFRdvicUgdiq.svg" /></a>
