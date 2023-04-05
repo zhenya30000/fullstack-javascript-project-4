@@ -12,8 +12,8 @@ program
   .version('0.0.1')
   .arguments('<url>')
   .option('-o, --output [dir]', 'output dir',cwd())
-  .action((url) => {
-    pageLoader(url);
+  .action((url, filePath) => {
+    pageLoader(url, filePath);
   });
 
 program.parse();

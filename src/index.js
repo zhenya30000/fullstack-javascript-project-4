@@ -4,10 +4,15 @@ import path from 'path';
 import { cwd } from 'process';
 import { generateFileName } from './helpers.js';
 
-const resolvePath = (filePath) => path.resolve(cwd(filePath), filePath);
-
-export default (url) => {
-  getPage(url)
-    .then((response) => fsp.writeFile(resolvePath(generateFileName(url)), response.data))
+const pageLoader = (url, dir = cwd()) => {
+  return getPage(url)
+    .then((response) => {
+      const fileName = generateFileName(url);
+      const filePath = path.resolve(dir, fileName);
+      return fsp.writeFile(filePath, response.data)
+        .then(() => filePath);
+    })
     .catch((error) => console.log(error));
 };
+
+export default pageLoader;
