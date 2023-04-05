@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 
 test('data match', async () => {
-  const pageLoaderData = await pageLoader(url, tempdir);
+  await pageLoader(url, tempdir);
   const dataBody = await fsp.readFile(
     path.join(tempdir, generateFileName(url))
   );
