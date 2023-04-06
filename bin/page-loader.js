@@ -12,9 +12,9 @@ program
   .description('Downloads a page from web')
   .version('0.0.1')
   .arguments('<url>')
-  .option('-o, --output [dir]', 'output dir',cwd())
+  .option('-o, --output [dir]', 'output dir', path.join(cwd(), './output'))
   .action((url, options) => {
-    console.log(options.output);
+    console.log('Downloading to', options.output);
     pageLoader(url, options.output);
   });
 
