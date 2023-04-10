@@ -3,7 +3,6 @@ import fs from 'fs';
 import fsp from 'fs/promises';
 import axios from 'axios';
 import path from 'path';
-import { cwd } from 'process';
 import { generateFileName } from './helpers.js';
 
 const getImageLinks = (html) => {
@@ -29,7 +28,6 @@ const downloadImage = (imageLinks, filePath) => {
         response.data.pipe(
           fs.createWriteStream(path.join(filePath, imageName))
         );
-        console.log('Done Saving image');
       });
     })
   );
