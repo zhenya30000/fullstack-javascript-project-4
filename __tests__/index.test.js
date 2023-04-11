@@ -4,8 +4,13 @@ import path from 'path';
 import os from 'os';
 import { generateFileName } from '../src/helpers.js';
 import nock from 'nock';
+import axios from 'axios';
+import httpAdapter from 'axios-http-adapter-commonjs/dist/AxiosHttpAdapter';
 
-const url = new URL('http://example.com/test');
+nock.disableNetConnect();
+
+const url = 'http://localhost';
+axios.defaults.adapter = httpAdapter;
 
 let tempdir;
 
@@ -14,7 +19,7 @@ beforeEach(async () => {
   tempdir = await fsp.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
-test('data match', async () => {
+test('html match', async () => {
   const responseBefore = await fsp.readFile(
     path.join('.', '__fixtures__', 'resBefore'),
     'utf-8'
@@ -23,13 +28,14 @@ test('data match', async () => {
     path.join('.', '__fixtures__', 'resAfter'),
     'utf-8'
   );
-
-  nock('http://example.com/test').get('/test').reply(200, responseBefore);
-  console.log(tempdir);
-  await pageLoader('http://example.com/test', tempdir);
+  nock('https://ru.hexlet.io/courses')
+    .get(/\/courses/)
+    .reply(200, responseBefore);
+  await pageLoader(url, tempdir);
   const dataBody = await fsp.readFile(
     path.join(tempdir, generateFileName(url, '.html')),
     'utf-8'
   );
   expect(dataBody).toEqual(responseAfter);
 });
+

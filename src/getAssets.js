@@ -33,15 +33,14 @@ const downloadImage = (imageLinks, filePath) => {
   );
 };
 
-export const getAssets = (url, resourcesPath) => {
+export const getAssets = (url, assetsPath) => {
   axios.get(url).then((response) => {
     const imageLinks = getImageLinks(response.data);
     fsp
-      .mkdir(resourcesPath)
+      .mkdir(assetsPath)
       .then(() => {
-        console.log('Done creating dir', resourcesPath);
-        downloadImage(imageLinks, resourcesPath);
+        downloadImage(imageLinks, assetsPath);
       })
-      .catch(() => downloadImage(imageLinks, resourcesPath));
+      .catch(() => downloadImage(imageLinks, assetsPath));
   });
 };

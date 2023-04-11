@@ -26,10 +26,9 @@ export const replaceImageLinks = (htmlString, host, newPath) => {
         let oldSrc = `${host}${srcAttrMatch[1]}`;
         const fileType = `.${oldSrc.split('.').at(-1)}`;
         const newName = generateFileName(oldSrc, fileType);
-        newHtml = resultHtml.replace(
-          srcAttrMatch[1],
-          path.join(newPath, newName)
-        );
+        newHtml = resultHtml
+          .replace(srcAttrMatch[1], path.join(newPath, newName))
+          .replace(' />', '>');
       }
     });
   }
