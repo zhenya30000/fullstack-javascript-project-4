@@ -4,13 +4,10 @@ import path from 'path';
 import os from 'os';
 import { generateFileName } from '../src/helpers.js';
 import nock from 'nock';
-import axios from 'axios';
-import httpAdapter from 'axios-http-adapter-commonjs/dist/AxiosHttpAdapter';
 
 nock.disableNetConnect();
 
-const url = 'http://localhost';
-axios.defaults.adapter = httpAdapter;
+const url = 'https://ru.hexlet.io/courses';
 
 let tempdir;
 
@@ -28,14 +25,23 @@ test('html match', async () => {
     path.join('.', '__fixtures__', 'resAfter'),
     'utf-8'
   );
-  nock('https://ru.hexlet.io/courses')
-    .get(/\/courses/)
-    .reply(200, responseBefore);
+
+  nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(200, responseBefore)
+    .get('/assets/application.css')
+    .reply(200, 'application.css')
+    .get('/packs/js/runtime.js')
+    .reply(200, 'runtime.js')
+    .get('/assets/professions/nodejs.png')
+    .reply(200, 'nodejs.png');
+
   await pageLoader(url, tempdir);
+
   const dataBody = await fsp.readFile(
     path.join(tempdir, generateFileName(url, '.html')),
     'utf-8'
   );
+
   expect(dataBody).toEqual(responseAfter);
 });
-

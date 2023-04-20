@@ -1,5 +1,3 @@
-import path from 'path';
-
 export const generateFileName = (url, fileType) => {
   const name = new URL(url);
   return (
@@ -11,26 +9,34 @@ export const generateFileName = (url, fileType) => {
   );
 };
 
-export const replaceImageLinks = (htmlString, host, newPath) => {
-  const imgRegExp = /<img [^>]+>/g;
-  const srcRegExp = /src=['"]([^'"]+)['"]/;
-
-  let resultHtml = htmlString;
-  const imgTags = resultHtml.match(imgRegExp);
-  let newHtml;
-
-  if (imgTags) {
-    imgTags.forEach((tag) => {
-      const srcAttrMatch = tag.match(srcRegExp);
-      if (srcAttrMatch) {
-        let oldSrc = `${host}${srcAttrMatch[1]}`;
-        const fileType = `.${oldSrc.split('.').at(-1)}`;
-        const newName = generateFileName(oldSrc, fileType);
-        newHtml = resultHtml
-          .replace(srcAttrMatch[1], path.join(newPath, newName))
-          .replace(' />', '>');
-      }
-    });
+export const isSameDomainLink = (url, baseUrl) => {
+  const link = new URL(url, baseUrl);
+  if (
+    link.hostname === new URL(baseUrl).hostname ||
+    link.toString().startsWith('/')
+  ) {
+    return true;
+  } else {
+    return false;
   }
-  return newHtml;
+};
+
+export const getFullLink = (relativeUrl, baseUrl) => {
+  const base = new URL(baseUrl);
+  const url = new URL(relativeUrl, base);
+  return url.toString();
+};
+
+export const replaceLinks = (links, html, assetsPath, baseUrl) => {
+  let result = html;
+  let fileType;
+  links.forEach((link) => {
+    link.split('.').length > 1 ? fileType = '.' + link.split('.').at(-1) : fileType = '.html';
+    const fullLink = getFullLink(link, baseUrl);
+    const fileName = generateFileName(fullLink, fileType, baseUrl);
+    return (result = result
+      .replace(link, `${assetsPath}/${fileName}`)
+      .replace(' />', '>'));
+  });
+  return result;
 };

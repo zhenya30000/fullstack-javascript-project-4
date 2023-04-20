@@ -2,45 +2,47 @@ import * as cheerio from 'cheerio';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import axios from 'axios';
+/* import httpAdapter from 'axios/lib/adapters/http.js' */
 import path from 'path';
-import { generateFileName } from './helpers.js';
+import { generateFileName, getFullLink, isSameDomainLink } from './helpers.js';
 
-const getImageLinks = (html) => {
+/* axios.defaults.adapter = httpAdapter; */
+
+export const getLinks = (html) => {
   const $ = cheerio.load(html);
-  const images = $('img');
-  const imageLinks = [];
-  images.each((i, img) => {
-    const src = $(img).attr('src');
-    const ext = src.split('.').at(-1);
-    if (ext === 'png' || ext === 'jpg') {
-      imageLinks.push(src);
-    }
+  const tags = $('link[href], img[src], script');
+  const links = [];
+  tags.each((_, tag) => {
+    const src = $(tag).attr('src') || $(tag).attr('href');
+    links.push(src);
   });
-  return imageLinks;
+
+  return links;
 };
 
-const downloadImage = (imageLinks, filePath) => {
+const downloadAssets = (links, host, filePath) => {
+  let fileType;
   Promise.all(
-    imageLinks.map((imageUrl) => {
-      const fileType = `.${imageUrl.split('.').at(-1)}`;
-      const imageName = generateFileName(imageUrl, fileType);
-      axios.get(`${imageUrl}`, { responseType: 'stream' }).then((response) => {
-        response.data.pipe(
-          fs.createWriteStream(path.join(filePath, imageName))
-        );
+    links.map((linkUrl) => {
+      const fullLink = getFullLink(linkUrl, host);
+      linkUrl.split('.').length > 1
+        ? (fileType = '.' + linkUrl.split('.').at(-1))
+        : (fileType = '.html');
+      const fileName = generateFileName(fullLink, fileType);
+      axios.get(fullLink, { responseType: 'stream' }).then((response) => {
+        response.data.pipe(fs.createWriteStream(path.join(filePath, fileName)));
       });
     })
-  );
+  ).catch((e) => console.error('Download error:', e));
 };
 
-export const getAssets = (url, assetsPath) => {
-  axios.get(url).then((response) => {
-    const imageLinks = getImageLinks(response.data);
-    fsp
-      .mkdir(assetsPath)
-      .then(() => {
-        downloadImage(imageLinks, assetsPath);
-      })
-      .catch(() => downloadImage(imageLinks, assetsPath));
-  });
+export const getAssets = (links, url, assetsPath) => {
+  fsp
+    .mkdir(assetsPath)
+    .then(() => {
+      downloadAssets(links, url, assetsPath);
+    })
+    .catch(() => {
+      downloadAssets(links, url, assetsPath);
+    });
 };
