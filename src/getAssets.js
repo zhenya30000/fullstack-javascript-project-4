@@ -47,12 +47,3 @@ export const getAssets = (links, url, assetsPath) => {
       downloadAssets(links, url, assetsPath);
     });
 };
-
-const api = axios.create({
-  baseURL: 'https://api.example.com',
-});
-
-api.interceptors.response.use((response) => {
-  logAxios('response:', response);
-  return response;
-});
