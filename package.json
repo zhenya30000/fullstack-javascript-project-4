@@ -25,6 +25,7 @@
     "axios-mock-adapter": "^1.21.4",
     "cheerio": "^1.0.0-rc.12",
     "commander": "^10.0.0",
+    "debug": "^4.3.4",
     "http": "^0.0.1-security",
     "jest": "^29.5.0",
     "make": "^0.8.1",

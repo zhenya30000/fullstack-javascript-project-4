@@ -2,11 +2,12 @@ import * as cheerio from 'cheerio';
 import fs from 'fs';
 import fsp from 'fs/promises';
 import axios from 'axios';
-/* import httpAdapter from 'axios/lib/adapters/http.js' */
 import path from 'path';
 import { generateFileName, getFullLink, isSameDomainLink } from './helpers.js';
+import debug from 'debug';
 
-/* axios.defaults.adapter = httpAdapter; */
+const logHttp = debug('http');
+const logAxios = debug('axios');
 
 export const getLinks = (html) => {
   const $ = cheerio.load(html);
@@ -23,10 +24,10 @@ export const getLinks = (html) => {
 const downloadAssets = (links, host, filePath) => {
   let fileType;
   Promise.all(
-    links.map((linkUrl) => {
-      const fullLink = getFullLink(linkUrl, host);
-      linkUrl.split('.').length > 1
-        ? (fileType = '.' + linkUrl.split('.').at(-1))
+    links.map((url) => {
+      const fullLink = getFullLink(url, host);
+      url.split('.').length > 1
+        ? (fileType = '.' + url.split('.').at(-1))
         : (fileType = '.html');
       const fileName = generateFileName(fullLink, fileType);
       axios.get(fullLink, { responseType: 'stream' }).then((response) => {
@@ -46,3 +47,12 @@ export const getAssets = (links, url, assetsPath) => {
       downloadAssets(links, url, assetsPath);
     });
 };
+
+const api = axios.create({
+  baseURL: 'https://api.example.com',
+});
+
+api.interceptors.response.use((response) => {
+  logAxios('response:', response);
+  return response;
+});

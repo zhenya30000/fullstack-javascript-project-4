@@ -21,12 +21,15 @@ test('html match', async () => {
     path.join('.', '__fixtures__', 'resBefore'),
     'utf-8'
   );
+
   const responseAfter = await fsp.readFile(
     path.join('.', '__fixtures__', 'resAfter'),
     'utf-8'
   );
 
   nock('https://ru.hexlet.io')
+    .get('/courses')
+    .reply(200, responseBefore)
     .get('/courses')
     .reply(200, responseBefore)
     .get('/assets/application.css')
