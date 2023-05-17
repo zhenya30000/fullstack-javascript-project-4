@@ -6,8 +6,8 @@ import path from 'path';
 import { generateFileName, getFullLink, isSameDomainLink } from './helpers.js';
 import debug from 'debug';
 
-const logHttp = debug('http');
 const logAxios = debug('axios');
+const error = debug('axios:error')
 
 export const getLinks = (html) => {
   const $ = cheerio.load(html);
@@ -17,7 +17,6 @@ export const getLinks = (html) => {
     const src = $(tag).attr('src') || $(tag).attr('href');
     links.push(src);
   });
-
   return links;
 };
 
@@ -34,7 +33,7 @@ const downloadAssets = (links, host, filePath) => {
         response.data.pipe(fs.createWriteStream(path.join(filePath, fileName)));
       });
     })
-  ).catch((e) => console.error('Download error:', e));
+  ).catch((e) => logAxios('Axios error: ', e));
 };
 
 export const getAssets = (links, url, assetsPath) => {

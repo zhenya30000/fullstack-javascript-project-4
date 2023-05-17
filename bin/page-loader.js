@@ -14,7 +14,6 @@ program
   .arguments('<url>')
   .option('-o, --output [dir]', 'output dir', path.join(cwd(), './output'))
   .action((url, options) => {
-    console.log('Downloading to', options.output);
     pageLoader(url, options.output);
   });
 
