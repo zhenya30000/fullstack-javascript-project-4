@@ -3,20 +3,21 @@ import fs from 'fs';
 import fsp from 'fs/promises';
 import axios from 'axios';
 import path from 'path';
-import { generateFileName, getFullLink, isSameDomainLink } from './helpers.js';
+import { generateFileName, getFullLink } from './helpers.js';
 import debug from 'debug';
 
 const logAxios = debug('axios');
-const error = debug('axios:error')
 
-export const getLinks = (html) => {
+export const getLinks = (html, url) => {
   const $ = cheerio.load(html);
   const tags = $('link[href], img[src], script');
   const links = [];
   tags.each((_, tag) => {
     const src = $(tag).attr('src') || $(tag).attr('href');
-    links.push(src);
-  });
+    if (src !== undefined && src !== url) {
+      links.push(src);
+    } 
+  }); 
   return links;
 };
 

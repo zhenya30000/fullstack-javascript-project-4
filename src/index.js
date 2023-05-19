@@ -6,41 +6,33 @@ import { getAssets, getLinks } from './getAssets.js';
 import debug from 'debug';
 
 const pageLoaderDebug = debug('pageLoader');
+const logError = debug('pageLoader:error');
 
 pageLoaderDebug('booting %o', 'Page loader');
 
 const pageLoader = (url, dir = './output') => {
-  console.log('start');
   pageLoaderDebug('Got url %o', url);
-  console.log('Got url %o', url);
   let sameDomainLinks;
-  pageLoaderDebug('generateFileName %o', generateFileName(url, ''));
   const assetsPath = `${generateFileName(url, '').split('.')[0]}_files`;
   pageLoaderDebug('Downloading assets to folder: %o', assetsPath);
   return getPage(url)
     .then((response) => {
       const fileName = generateFileName(url, '.html');
-
-      console.log("🚀 ~ file: index.js:24 ~ .then ~ fileName:", fileName);
-
-      pageLoaderDebug('Filename: %o', fileName);
       const filePath = path.join(dir, fileName);
-      pageLoaderDebug('Filepath: %o', filePath);
-      const links = getLinks(response.data);
+      const links = getLinks(response.data, url);
       sameDomainLinks = links.filter((link) => isSameDomainLink(link, url));
       const updatedHtml = replaceLinks(sameDomainLinks, response.data, assetsPath, url);
-      pageLoaderDebug('Html: %o', updatedHtml);
       return fsp
         .writeFile(filePath, updatedHtml)
         .then(() => filePath)
-        .catch((e) => pageLoaderDebug('Can\'t create file: ', e));
+        .catch((e) => logError('Can\'t create file: ', e));
     })
     .then(() => {
        getAssets(sameDomainLinks, url, path.join(dir, assetsPath));
     })
-    .catch((e) => pageLoaderDebug('Error: ', e));
+    .catch((e) => logError('Error: ', e));
 };
 
 export default pageLoader;
 
-pageLoader('https://ru.hexlet.io/courses', './output');
+/* pageLoader('https://ru.hexlet.io/courses', './output'); */
